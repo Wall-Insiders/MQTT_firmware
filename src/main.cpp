@@ -5,6 +5,7 @@
 
 void setup_wifi();
 void callback(char* topic, byte* payload, unsigned int length);
+void reconnect();
 
 const char *ssid = "Aiden's IPhone";
 const char *pass = "d7ru9sq5xhp4d";
@@ -21,6 +22,7 @@ PubSubClient client (espClient);
 unsigned long debounceDuration = 100;
 bool prevSwitch_State = 0;
 bool switch_State = 0;
+String button_pressed = "Button is not pressed";
 
 void setup() {
   // put your setup code here, to run once:
@@ -35,6 +37,24 @@ void setup() {
 
   setup_wifi();
   client.setServer(broker, 1883);
+
+  Serial.println("Attempting to connect to MQTT broker");
+  if(!client.connected())
+  {
+    Serial.println("MQTT falied to connect");
+    Serial.println(client.state());
+    Serial.println("Attempting to reconnect in 5 seconds");
+    delay(5000);
+    while(1);
+  }
+  else if (client.connected())
+  {
+    Serial.println("Connected to MQTT broker");
+    Serial.print("Publishing to: ");
+    Serial.println(TOPIC);
+    Serial.println('\n');
+  }
+  //reconnect();
 }
 
 void setup_wifi()
@@ -55,32 +75,33 @@ void setup_wifi()
   Serial.println("You are connected");
   Serial.println();
   digitalWrite(Network_LED, HIGH);
-  Serial.print("IP address: ");
-  Serial.print(WiFi.localIP());
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
-void reconnect()
- {
-  while (!client.connected())
-  {
-    Serial.print("Connecting to MQTT broker");
+// void reconnect()
+//  {
+//   if (!client.connected())
+//   {
+//     Serial.println("Connecting to MQTT broker");
 
-    if(client.connect("ESP8266Client"))
-    {
-      Serial.println("connected");
-      Serial.print("Publishing to: ");
-      Serial.println(TOPIC);
-      Serial.println('\n');
-    }
-    else
-    {
-      Serial.print("Failed to connect; rc: ");
-      Serial.print(client.state());
-      Serial.println("trying again in 5 seconds");
-      delay(5000);
-    }
-  }
- }
+//     if(client.connect("ESP8266Client"))
+//     {
+//       Serial.println("connected");
+//       Serial.print("Publishing to: ");
+//       Serial.println(TOPIC);
+//       Serial.println('\n');
+//     }
+//     else
+//     {
+//       Serial.print("Failed to connect; rc: ");
+//       Serial.print(client.state());
+//       Serial.println("trying again in 5 seconds");
+//       delay(5000);
+//     }
+//   }
+//   while(1);
+//  }
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -90,23 +111,25 @@ void loop() {
 
   if (!client.connected())
   {
-    reconnect();
+    // reconnect();
     digitalWrite(MQTT_LED, HIGH);
   }
   
-  if(digitalRead(button) == 0)
+  if(prevSwitch_State != switch_State)
   {
-    prevSwitch_State != switch_State;
-    if (switch_State == 1)
+    if (switch_State == HIGH)
     {
-      client.publish(topic, "on");
-      Serial.println((String)topic + " => on");
+      button_pressed = "Button is pressed";
     }
     else
     {
-      client.publish(topic, "off");
-      Serial.println((String)topic + "=> off");
+      button_pressed = "Button is not pressed";
     }
+    Serial.println("Button send to topic: ");
+    Serial.println(button_pressed);
+    Serial.println(switch_State);
+
+    client.publish(topic, button_pressed.c_str());
 
     while (digitalRead(switch_State) == 0)
     {
