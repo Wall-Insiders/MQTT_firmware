@@ -1,5 +1,8 @@
-#define SECRET_SSID "MSI 8671"
-#define SECRET_PASS "155+N7x8"
+// #define SECRET_SSID "MSI 8671"
+// #define SECRET_PASS "155+N7x8"
+
+#define SECRET_SSID "Aiden's IPhone"
+#define SECRET_PASS "d7ru9sq5xhp4d"
 
 #define button 2
 
