@@ -19,6 +19,8 @@ PubSubClient client (espClient);
 
 //button state stuff
 //boolean values for now
+
+//need to make them float for analog values
 unsigned long debounceDuration = 100;
 bool prevSwitch_State = 0;
 bool switch_State = 0;
