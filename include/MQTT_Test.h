@@ -4,10 +4,10 @@
 #define SECRET_SSID "Aiden's IPhone"
 #define SECRET_PASS "d7ru9sq5xhp4d"
 
-#define button 2
+#define button 23
 
 //for network connection
-#define Network_LED 4
+#define Network_LED 2
 //for connection broker connection
 #define MQTT_LED 5
 
